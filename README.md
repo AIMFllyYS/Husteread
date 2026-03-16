@@ -117,7 +117,7 @@ HUSTERead 是一个面向华中科技大学读书会成员的**非官方**展示
 
 | 层级 | 技术 |
 |------|------|
-| 框架 | Next.js 15 (App Router) |
+| 框架 | Next.js 16+ (App Router + Turbopack) |
 | 语言 | TypeScript |
 | 样式 | Tailwind CSS v4 |
 | 数据库 | PostgreSQL (阿里云 RDS) |
