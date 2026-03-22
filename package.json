@@ -1,5 +1,30 @@
 {
+  "name": "husteread",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HUSTERead — 华科读书会展示平台",
+  "scripts": {
+    "dev": "next dev --port 7762",
+    "build": "next build",
+    "start": "next start --port 7762",
+    "lint": "eslint"
+  },
   "dependencies": {
-    "@duck4nh/antigravity-kit": "^2.0.1"
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.99.3",
+    "next": "16.2.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.1",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
