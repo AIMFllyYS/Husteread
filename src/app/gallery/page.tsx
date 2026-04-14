@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Camera } from "lucide-react";
 
@@ -46,15 +47,16 @@ export default function GalleryPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: (i % 4) * 0.1, duration: 0.6, ease: "easeOut" }}
-            className={`relative break-inside-avoid overflow-hidden rounded-sm border-[6px] border-[#FFFDF8] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] transform transition-transform duration-500 hover:scale-[1.03] group ${photo.height} hover:z-10`}
+            className={`relative break-inside-avoid overflow-hidden rounded-sm border-[6px] border-[#FFFDF8] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-transform duration-500 hover:scale-[1.02] group ${photo.height} hover:z-10`}
           >
             <div className="h-full w-full flex flex-col relative overflow-hidden">
-              {/* Image with subtle sepia reading filter */}
-              <img 
-                src={photo.src} 
+              <Image
+                src={photo.src}
                 alt={photo.alt}
-                className="absolute inset-0 w-full h-full object-cover transition-all duration-[2s] group-hover:scale-110 sepia-[15%] group-hover:sepia-0 brightness-95"
-                loading="lazy"
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                priority={i < 2}
               />
               
               {/* Hover Caption Details */}
@@ -66,8 +68,8 @@ export default function GalleryPage() {
               </div>
             </div>
             
-            {/* Vintage Film Overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.15] mix-blend-overlay bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E')]" />
+            {/* Lightweight grain overlay to keep vintage mood */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.08] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:3px_3px]" />
             
             {/* Elegant inner shadow for print feel */}
             <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.15)]" />

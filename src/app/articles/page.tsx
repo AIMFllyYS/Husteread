@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Search, BookMarked, Eye } from "lucide-react";
 
@@ -18,13 +18,24 @@ const articles = [
 export default function ArticlesPage() {
   const [activeTab, setActiveTab] = useState("全部分类");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
-  const filtered = articles.filter(a => {
-    if (a.featured) return false;
-    const matchesTab = activeTab === "全部分类" || a.category === activeTab;
-    const matchesSearch = a.title.includes(searchQuery) || a.author.includes(searchQuery);
-    return matchesTab && matchesSearch;
-  });
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery.trim()), 180);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const filtered = useMemo(() => {
+    return articles.filter((a) => {
+      if (a.featured) return false;
+      const matchesTab = activeTab === "全部分类" || a.category === activeTab;
+      const matchesSearch =
+        !debouncedQuery ||
+        a.title.includes(debouncedQuery) ||
+        a.author.includes(debouncedQuery);
+      return matchesTab && matchesSearch;
+    });
+  }, [activeTab, debouncedQuery]);
 
   const featured = articles.find(a => a.featured) || articles[0];
 
@@ -43,7 +54,7 @@ export default function ArticlesPage() {
             <p className="font-sans text-xs tracking-[0.4em] text-muted-foreground mb-4 flex items-center gap-4">
               <span className="w-12 h-[2px] bg-primary" /> LITERARY ARCHIVE
             </p>
-            <h1 className="flex flex-col font-serif font-bold text-foreground tracking-tighter mix-blend-multiply dark:mix-blend-screen w-full">
+            <h1 className="blend-heavy flex flex-col font-serif font-bold text-foreground tracking-tighter mix-blend-multiply dark:mix-blend-screen w-full">
               <span className="text-[12vw] sm:text-[10vw] leading-[0.8] mb-4 text-foreground">浩瀚书卷</span>
               <div className="flex items-center gap-4 md:gap-8 justify-end w-full pr-[5vw]">
                 <span className="w-16 md:w-32 h-[2px] bg-foreground/80 block" />
@@ -144,16 +155,10 @@ export default function ArticlesPage() {
                 <th className="py-6 px-4 w-36 font-normal text-right">收录日期</th>
               </tr>
             </thead>
-            <AnimatePresence>
-              <motion.tbody>
+            <tbody>
                 {filtered.map((art) => (
-                  <motion.tr
+                  <tr
                     key={art.id}
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, display: "none" }}
-                    transition={{ duration: 0.4 }}
                     className="border-b border-dashed border-border/80 group hover:bg-muted/30 transition-colors cursor-pointer"
                   >
                     <td className="py-8 px-4 font-mono text-sm tracking-widest text-muted-foreground/60">
@@ -182,7 +187,7 @@ export default function ArticlesPage() {
                     <td className="py-8 px-4 font-mono text-sm text-right text-foreground tracking-widest">
                       {art.date}
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))}
                 {filtered.length === 0 && (
                   <tr>
@@ -191,8 +196,7 @@ export default function ArticlesPage() {
                     </td>
                   </tr>
                 )}
-              </motion.tbody>
-            </AnimatePresence>
+            </tbody>
           </table>
         </div>
 

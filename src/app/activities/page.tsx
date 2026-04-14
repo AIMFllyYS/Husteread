@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
 import {
   CalendarDays, MapPin, Users, ArrowRight, BookOpen, Feather, Music, Star, Sparkles, Clock, CornerDownRight
 } from "lucide-react";
-import { EtheralShadow } from "@/components/ui/etheral-shadow";
+
+const EtheralShadow = dynamic(
+  () => import("@/components/ui/etheral-shadow").then((m) => m.EtheralShadow),
+  { ssr: false }
+);
 
 // ─────────────────────────────────────────────
 // Data — strictly from docs/source
@@ -83,11 +88,12 @@ function HeroSection() {
 
   return (
     <div ref={ref} className="relative h-[85vh] min-h-[600px] w-full bg-background overflow-hidden flex flex-col justify-end">
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-multiply dark:mix-blend-screen">
+      <div className="blend-heavy absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-multiply dark:mix-blend-screen">
         <EtheralShadow
           color="var(--background)"
           animation={{ scale: 75, speed: 65 }}
           noise={{ opacity: 0.6, scale: 1.5 }}
+          performanceMode="low"
         />
       </div>
 
@@ -156,18 +162,15 @@ function StatsBar() {
 }
 
 function ListRow({ event, index }: { event: (typeof events)[0], index: number }) {
-  const [hovered, setHovered] = useState(false);
   const isPast = event.era === "past";
 
   return (
     <motion.div
-      initial={{ opacity: 0, borderBottomWidth: 0 }}
-      whileInView={{ opacity: 1, borderBottomWidth: 1 }}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-10%" }}
       transition={{ duration: 0.8, delay: index * 0.1 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="group relative border-border/40 pb-12 pt-12 flex flex-col md:flex-row gap-6 md:gap-16 items-start"
+      className="group relative border-b border-border/40 pb-12 pt-12 flex flex-col md:flex-row gap-6 md:gap-16 items-start"
     >
       {/* Brutalist Metabar */}
       <div className="w-full md:w-1/4 shrink-0 flex flex-col gap-4 relative z-10">
@@ -191,7 +194,7 @@ function ListRow({ event, index }: { event: (typeof events)[0], index: number })
            <span className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground">• {event.season}</span>
         </div>
         
-        <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground leading-[1.1] mb-6 group-hover:italic transition-all duration-500">
+        <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground leading-[1.1] mb-6 group-hover:italic transition-[font-style,color] duration-500">
            {event.title}
         </h2>
         
@@ -204,7 +207,7 @@ function ListRow({ event, index }: { event: (typeof events)[0], index: number })
         </p>
 
         {/* Collapsed/Hover Detail area using CSS height transition instead of layout for brutalist snap */}
-        <div className="overflow-hidden transition-all duration-700 ease-[0.16,1,0.3,1] max-h-0 opacity-0 group-hover:max-h-[500px] group-hover:opacity-100 flex flex-col gap-4">
+        <div className="overflow-hidden max-h-0 opacity-0 translate-y-2 transition-[max-height,opacity,transform] duration-700 ease-[0.16,1,0.3,1] group-hover:max-h-[500px] group-hover:opacity-100 group-hover:translate-y-0 flex flex-col gap-4">
            <div className="h-px w-full bg-border/40 my-2" />
            <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/40 mb-1 flex items-center gap-2">
              <CornerDownRight className="w-3 h-3" /> Agenda Elements

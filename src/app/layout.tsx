@@ -7,7 +7,7 @@ import Footer from "@/components/layout/Footer";
 const notoSerifSC = Noto_Serif_SC({
   variable: "--font-serif",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
@@ -39,6 +39,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-serif selection:bg-primary selection:text-primary-foreground bg-background text-foreground">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var tier='perf-tier-1';var lowCpu=(navigator.hardwareConcurrency||8)<=4;var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(lowCpu||reduced){tier='perf-tier-2';}document.documentElement.classList.add(tier);}catch(e){}})();`,
+          }}
+        />
         <Navbar />
         <main className="flex-1 w-full flex flex-col">
           {children}

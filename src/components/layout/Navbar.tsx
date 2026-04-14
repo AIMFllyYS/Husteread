@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 import { User, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +17,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+    <header className="blur-heavy sticky top-0 z-50 w-full border-b border-border/40 bg-background/92 supports-[backdrop-filter]:bg-background/88">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         {/* Logo Section */}
         <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
@@ -43,11 +42,7 @@ export default function Navbar() {
               >
                 {link.name}
                 {isActive && (
-                  <motion.div
-                    layoutId="navbar-indicator"
-                    className="absolute -bottom-[19px] left-0 right-0 h-[2px] bg-primary"
-                    transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
-                  />
+                  <span className="absolute -bottom-[19px] left-0 right-0 h-[2px] bg-primary" />
                 )}
               </Link>
             );

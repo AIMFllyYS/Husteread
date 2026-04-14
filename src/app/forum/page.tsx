@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { MessageSquarePlus, Clock, Heart, MoveRight, Search, Flame, Hash, Filter } from "lucide-react";
 
 const trendingTags = ["拉美文学", "存在主义", "博尔赫斯", "阅读方法论", "秋季书单"];
@@ -17,13 +17,24 @@ const posts = [
 
 export default function ForumPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
-  const filteredPosts = posts.filter(post => {
-    const matchesSearch = post.content.includes(searchQuery) || post.author.includes(searchQuery);
-    const matchesTag = activeTag ? post.tags.includes(activeTag) : true;
-    return matchesSearch && matchesTag;
-  });
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery.trim()), 180);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const filteredPosts = useMemo(() => {
+    return posts.filter((post) => {
+      const matchesSearch =
+        !debouncedQuery ||
+        post.content.includes(debouncedQuery) ||
+        post.author.includes(debouncedQuery);
+      const matchesTag = activeTag ? post.tags.includes(activeTag) : true;
+      return matchesSearch && matchesTag;
+    });
+  }, [activeTag, debouncedQuery]);
 
   return (
     <div className="bg-background min-h-screen text-foreground selection:bg-primary selection:text-primary-foreground pb-32">
@@ -39,7 +50,7 @@ export default function ForumPage() {
           <p className="font-sans text-xs md:text-sm tracking-[0.4em] text-muted-foreground flex items-center gap-4 mb-4">
             <span className="w-12 h-[2px] bg-primary" /> MICRO DISCOURSE
           </p>
-          <h1 className="flex flex-col font-serif font-bold text-foreground tracking-tighter mix-blend-multiply dark:mix-blend-screen w-full">
+          <h1 className="blend-heavy flex flex-col font-serif font-bold text-foreground tracking-tighter mix-blend-multiply dark:mix-blend-screen w-full">
             <span className="text-[15vw] md:text-[8vw] leading-[0.8] mb-2 md:mb-6 text-foreground">思维</span>
             <div className="flex items-center gap-4 md:gap-8 pl-[5vw] md:pl-[4vw]">
               <span className="w-16 md:w-32 h-[3px] bg-foreground/80 block" />
@@ -99,28 +110,24 @@ export default function ForumPage() {
 
       {/* 3. Masonry Wall of Echoes */}
       <div className="w-full px-6 md:px-16 pt-16 mx-auto">
-        <AnimatePresence mode="popLayout">
-          {filteredPosts.length === 0 ? (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="py-32 text-center font-sans tracking-widest text-muted-foreground uppercase"
-            >
-              未找到思想共振
-            </motion.div>
-          ) : (
-            <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
-              {filteredPosts.map((post, i) => (
-                <motion.div
-                  layout
-                  key={post.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: 0.05 * i, duration: 0.4 }}
-                  className="break-inside-avoid group relative flex flex-col border-[2px] border-foreground bg-background p-8 md:p-10 hover:bg-muted/30 transition-colors duration-500 w-full shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.05)]"
-                >
+        {filteredPosts.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="py-32 text-center font-sans tracking-widest text-muted-foreground uppercase"
+          >
+            未找到思想共振
+          </motion.div>
+        ) : (
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+            {filteredPosts.map((post, i) => (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 * i, duration: 0.4 }}
+                className="break-inside-avoid group relative flex flex-col border-[2px] border-foreground bg-background p-8 md:p-10 hover:bg-muted/30 transition-colors duration-500 w-full shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.05)]"
+              >
                   {/* Header inside card */}
                   <div className="flex justify-between items-start mb-8 border-b-2 border-foreground pb-6">
                     <div className="flex items-center gap-4">
@@ -151,7 +158,7 @@ export default function ForumPage() {
                   </div>
 
                   {/* Main Fragment */}
-                  <p className="font-serif text-xl md:text-2xl leading-[1.6] text-foreground mb-12 relative z-10 break-words group-hover:italic transition-all duration-700 tracking-wide">
+                  <p className="font-serif text-xl md:text-2xl leading-[1.6] text-foreground mb-12 relative z-10 break-words group-hover:italic transition-[font-style] duration-700 tracking-wide">
                     {post.content}
                   </p>
 
@@ -169,11 +176,10 @@ export default function ForumPage() {
                       介入 <MoveRight className="w-3 h-3" />
                     </button>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

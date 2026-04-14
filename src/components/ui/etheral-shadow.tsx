@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useRef, useId, useEffect, CSSProperties } from "react";
-import { animate, useMotionValue, AnimationPlaybackControls } from "framer-motion";
+import React, { CSSProperties } from "react";
 
 // Type definitions
 interface ResponsiveImage {
@@ -11,7 +10,6 @@ interface ResponsiveImage {
 }
 
 interface AnimationConfig {
-  preview?: boolean;
   scale: number;
   speed: number;
 }
@@ -29,76 +27,30 @@ interface ShadowOverlayProps {
   color?: string;
   animation?: AnimationConfig;
   noise?: NoiseConfig;
+  performanceMode?: "high" | "balanced" | "low";
   style?: CSSProperties;
   className?: string;
   children?: React.ReactNode;
 }
-
-function mapRange(
-  value: number,
-  fromLow: number,
-  fromHigh: number,
-  toLow: number,
-  toHigh: number
-): number {
-  if (fromLow === fromHigh) {
-    return toLow;
-  }
-  const percentage = (value - fromLow) / (fromHigh - fromLow);
-  return toLow + percentage * (toHigh - toLow);
-}
-
-const useInstanceId = (): string => {
-  const id = useId();
-  const cleanId = id.replace(/:/g, "");
-  return `shadowoverlay-${cleanId}`;
-};
 
 export function EtheralShadow({
   sizing = "fill",
   color = "rgba(40, 40, 45, 1)",
   animation = { scale: 80, speed: 70 },
   noise = { opacity: 0.8, scale: 1 },
+  performanceMode = "balanced",
   style,
   className,
   children,
 }: ShadowOverlayProps) {
-  const id = useInstanceId();
-  const animationEnabled = animation && animation.scale > 0;
-  const feColorMatrixRef = useRef<SVGFEColorMatrixElement>(null);
-  const hueRotateMotionValue = useMotionValue(180);
-  const hueRotateAnimation = useRef<AnimationPlaybackControls | null>(null);
-
-  const displacementScale = animation ? mapRange(animation.scale, 1, 100, 20, 100) : 0;
-  const animationDuration = animation ? mapRange(animation.speed, 1, 100, 1000, 50) : 1;
-
-  useEffect(() => {
-    if (feColorMatrixRef.current && animationEnabled) {
-      if (hueRotateAnimation.current) {
-        hueRotateAnimation.current.stop();
-      }
-      hueRotateMotionValue.set(0);
-      hueRotateAnimation.current = animate(hueRotateMotionValue, 360, {
-        duration: animationDuration / 25,
-        repeat: Infinity,
-        repeatType: "loop",
-        repeatDelay: 0,
-        ease: "linear",
-        delay: 0,
-        onUpdate: (value: number) => {
-          if (feColorMatrixRef.current) {
-            feColorMatrixRef.current.setAttribute("values", String(value));
-          }
-        },
-      });
-
-      return () => {
-        if (hueRotateAnimation.current) {
-          hueRotateAnimation.current.stop();
-        }
-      };
-    }
-  }, [animationEnabled, animationDuration, hueRotateMotionValue]);
+  const reducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const shouldAnimate =
+    !reducedMotion && performanceMode !== "low" && animation && animation.scale > 0;
+  const textureSize = `${Math.max(120, noise.scale * 200)}px`;
+  const driftDuration = `${Math.max(20, 140 - animation.speed)}s`;
+  const maskImage = "url('https://framerusercontent.com/images/ceBGguIpUU8luwByxuQz79t7To.png')";
 
   return (
     <div
@@ -114,64 +66,20 @@ export function EtheralShadow({
       <div
         style={{
           position: "absolute",
-          inset: -displacementScale,
-          filter: animationEnabled ? `url(#${id}) blur(4px)` : "none",
+          inset: performanceMode === "high" ? -24 : -12,
         }}
       >
-        {animationEnabled && (
-          <svg style={{ position: "absolute" }}>
-            <defs>
-              <filter id={id}>
-                <feTurbulence
-                  result="undulation"
-                  numOctaves="2"
-                  baseFrequency={`${mapRange(animation.scale, 0, 100, 0.001, 0.0005)},${mapRange(
-                    animation.scale,
-                    0,
-                    100,
-                    0.004,
-                    0.002
-                  )}`}
-                  seed="0"
-                  type="turbulence"
-                />
-                <feColorMatrix
-                  ref={feColorMatrixRef}
-                  in="undulation"
-                  type="hueRotate"
-                  values="180"
-                />
-                <feColorMatrix
-                  in="dist"
-                  result="circulation"
-                  type="matrix"
-                  values="4 0 0 0 1  4 0 0 0 1  4 0 0 0 1  1 0 0 0 0"
-                />
-                <feDisplacementMap
-                  in="SourceGraphic"
-                  in2="circulation"
-                  scale={displacementScale}
-                  result="dist"
-                />
-                <feDisplacementMap
-                  in="dist"
-                  in2="undulation"
-                  scale={displacementScale}
-                  result="output"
-                />
-              </filter>
-            </defs>
-          </svg>
-        )}
         <div
           style={{
             backgroundColor: color,
-            maskImage: `url('https://framerusercontent.com/images/ceBGguIpUU8luwByxuQz79t7To.png')`,
+            maskImage,
             maskSize: sizing === "stretch" ? "100% 100%" : "cover",
             maskRepeat: "no-repeat",
             maskPosition: "center",
             width: "100%",
             height: "100%",
+            transform: shouldAnimate ? "scale(1.02)" : "none",
+            animation: shouldAnimate ? `etherealDrift ${driftDuration} linear infinite` : "none",
           }}
         />
       </div>
@@ -191,12 +99,13 @@ export function EtheralShadow({
           style={{
             position: "absolute",
             inset: 0,
-            backgroundImage: `url("https://framerusercontent.com/images/g0QcWrxr87K0ufOxIUFBakwYA8.png")`,
-            backgroundSize: noise.scale * 200,
+            backgroundImage:
+              "radial-gradient(circle at center, rgba(255,255,255,0.25) 1px, transparent 1px)",
+            backgroundSize: textureSize,
             backgroundRepeat: "repeat",
             opacity: noise.opacity / 2,
             pointerEvents: "none",
-            mixBlendMode: "overlay",
+            mixBlendMode: performanceMode === "high" ? "overlay" : "normal",
           }}
         />
       )}

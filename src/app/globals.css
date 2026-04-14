@@ -94,7 +94,8 @@
 
 body {
   background-color: var(--background);
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  background-image: radial-gradient(circle at center, rgba(42, 42, 42, 0.03) 1px, transparent 1px);
+  background-size: 3px 3px;
   color: var(--foreground);
   font-family: var(--font-serif), "Noto Serif SC", Georgia, "Times New Roman", serif;
   -webkit-font-smoothing: antialiased;
@@ -102,6 +103,35 @@ body {
   ::selection {
     background: var(--primary);
     color: var(--primary-foreground);
+  }
+}
+
+@keyframes etherealDrift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.02);
+  }
+  50% {
+    transform: translate3d(-1.5%, 1.5%, 0) scale(1.035);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.02);
+  }
+}
+
+.perf-tier-2 .blend-heavy {
+  mix-blend-mode: normal !important;
+  opacity: 0.22 !important;
+}
+
+.perf-tier-2 .blur-heavy {
+  backdrop-filter: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

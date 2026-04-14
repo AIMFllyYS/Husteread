@@ -2,8 +2,13 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ArrowRight, BookOpen, PenTool } from "lucide-react";
-import { EtheralShadow } from "@/components/ui/etheral-shadow";
+
+const EtheralShadow = dynamic(
+  () => import("@/components/ui/etheral-shadow").then((m) => m.EtheralShadow),
+  { ssr: false }
+);
 
 export default function Home() {
   return (
@@ -12,11 +17,12 @@ export default function Home() {
       {/* 1. Typographic Hero / Extreme Asymmetry (Chinese Focused) */}
       <section className="relative w-full h-[90vh] min-h-[700px] flex object-cover overflow-hidden bg-background border-b border-border">
         {/* Subtle background texture */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-multiply dark:mix-blend-screen">
+        <div className="blend-heavy absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-multiply dark:mix-blend-screen">
           <EtheralShadow
             color="var(--background)"
             animation={{ scale: 100, speed: 80 }}
             noise={{ opacity: 0.8, scale: 1.2 }}
+            performanceMode="balanced"
           />
         </div>
 
@@ -37,7 +43,7 @@ export default function Home() {
               HUSTeread
             </div>
             
-            <h1 className="flex flex-col font-serif font-bold text-foreground tracking-tighter mix-blend-darken dark:mix-blend-lighten relative z-10 w-full mb-12">
+            <h1 className="blend-heavy flex flex-col font-serif font-bold text-foreground tracking-tighter mix-blend-darken dark:mix-blend-lighten relative z-10 w-full mb-12">
               <span className="text-[15vw] sm:text-[12vw] leading-[0.8] mb-2 md:mb-6">字里行间</span>
               <div className="flex items-center gap-4 md:gap-12 pl-[5vw] md:pl-[10vw]">
                 <span className="w-16 md:w-32 h-[2px] bg-foreground/80 block" />
