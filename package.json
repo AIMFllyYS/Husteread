@@ -7,18 +7,29 @@
     "dev": "next dev --port 7762",
     "build": "next build",
     "start": "next start --port 7762",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.99.3",
+    "clsx": "^2.1.1",
+    "crypto-random-string": "^5.0.0",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.0.1",
     "next": "16.2.1",
+    "nodemailer": "^8.0.3",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",

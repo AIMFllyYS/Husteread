@@ -1,6 +1,2 @@
-/**
- * HUSTERead Shared Business Components
- *
- * Reusable components shared across features.
- */
-export {};
+export { Navbar } from "./navbar";
+export { Footer } from "./footer";

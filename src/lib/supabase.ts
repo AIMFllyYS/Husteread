@@ -32,3 +32,17 @@ export function createPublicClient() {
 
   return createClient(supabaseUrl, anonKey);
 }
+
+/**
+ * 公开客户端单例（使用 anon key，受 RLS 约束）
+ */
+export const supabasePublic = createPublicClient();
+
+/**
+ * 服务端客户端（懒加载，避免仅使用 public 时因缺少 service key 崩溃）
+ */
+let _serviceClient: ReturnType<typeof createClient> | null = null;
+export function getServiceClient() {
+  if (!_serviceClient) _serviceClient = createServiceClient();
+  return _serviceClient;
+}
