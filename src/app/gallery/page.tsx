@@ -1,81 +1,106 @@
-"use client";
+import { InteractiveBentoGallery, type MediaItemType } from "@/components/ui";
 
-import Image from "next/image";
-import { motion } from "framer-motion";
-import { Camera } from "lucide-react";
-
-// Mock masonry data demonstrating varied heights for the photo wall
-const photos = [
-  { id: 1, src: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=1000", alt: "读书会现场", height: "h-[300px]", caption: "《百年的孤独》精读分享会" },
-  { id: 2, src: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=1000", alt: "讲书", height: "h-[450px]", caption: "文学与电影的互文" },
-  { id: 3, src: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1000", alt: "图书馆的角落", height: "h-[350px]", caption: "初雪，一个人读书" },
-  { id: 4, src: "https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1000", alt: "沉浸式阅读", height: "h-[400px]", caption: "草坪读诗夜" },
-  { id: 5, src: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1000", alt: "摆满书的桌子", height: "h-[300px]", caption: "Sunlight 周末沙龙" },
-  { id: 6, src: "https://images.unsplash.com/photo-1476275466078-4007374efac4?q=80&w=1000", alt: "手边的咖啡和书", height: "h-[480px]", caption: "咖啡与哲学" },
-  { id: 7, src: "https://images.unsplash.com/photo-1524578974012-ef36c84b4233?q=80&w=1000", alt: "书本特写", height: "h-[360px]", caption: "二手书交换活动" },
-  { id: 8, src: "https://images.unsplash.com/photo-1510172951991-856a654063f9?q=80&w=1000", alt: "讲座", height: "h-[400px]", caption: "人文讲坛记录" },
+const mediaItems: MediaItemType[] = [
+  {
+    id: 1,
+    type: "image",
+    title: "读书会现场",
+    desc: "《百年的孤独》精读分享会，思想在字里行间碰撞。",
+    url: "https://images.unsplash.com/photo-1529148482759-b35b25c5f217?q=80&w=1200&auto=format&fit=crop",
+    fallbackUrl: "https://dummyimage.com/1200x900/f0ece4/7E1518.png&text=HUSTERead+Gallery",
+    span: "md:col-span-2 md:row-span-4 sm:col-span-2 sm:row-span-3",
+  },
+  {
+    id: 2,
+    type: "image",
+    title: "文学与电影",
+    desc: "书影音主题对谈，探索叙事的多种可能。",
+    url: "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1200&auto=format&fit=crop",
+    fallbackUrl: "https://dummyimage.com/1600x1000/f0ece4/7E1518.png&text=HUSTERead+Gallery",
+    span: "md:col-span-1 md:row-span-2 sm:col-span-1 sm:row-span-2",
+  },
+  {
+    id: 3,
+    type: "image",
+    title: "图书馆角落",
+    desc: "在静谧的午后，与古人进行一场跨越时空的对话。",
+    url: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1200&auto=format&fit=crop",
+    fallbackUrl: "https://dummyimage.com/1200x1000/f0ece4/7E1518.png&text=HUSTERead+Gallery",
+    span: "md:col-span-1 md:row-span-2 sm:col-span-1 sm:row-span-2",
+  },
+  {
+    id: 4,
+    type: "image",
+    title: "草坪读诗夜",
+    desc: "星空下的诗意栖居，让灵魂在韵律中自由呼吸。",
+    url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop",
+    fallbackUrl: "https://dummyimage.com/1400x900/f0ece4/7E1518.png&text=HUSTERead+Gallery",
+    span: "md:col-span-2 md:row-span-3 sm:col-span-2 sm:row-span-2",
+  },
+  {
+    id: 5,
+    type: "image",
+    title: "Sunlight 沙龙",
+    desc: "阳光洒在书页上，也洒在每一个热爱阅读的心灵里。",
+    url: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=1200&auto=format&fit=crop",
+    fallbackUrl: "https://dummyimage.com/1100x1200/f0ece4/7E1518.png&text=HUSTERead+Gallery",
+    span: "md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2",
+  },
+  {
+    id: 6,
+    type: "image",
+    title: "咖啡与哲学",
+    desc: "苦涩的咖啡与深邃的思想，是午后最完美的搭配。",
+    url: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200&auto=format&fit=crop",
+    fallbackUrl: "https://dummyimage.com/1500x900/f0ece4/7E1518.png&text=HUSTERead+Gallery",
+    span: "md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2",
+  },
+  {
+    id: 7,
+    type: "image",
+    title: "二手书交换",
+    desc: "每一本书都是一段旅程，交换书籍，也是交换彼此的故事。",
+    url: "https://images.unsplash.com/photo-1524578974012-ef36c84b4233?q=80&w=1200&auto=format&fit=crop",
+    fallbackUrl: "https://dummyimage.com/1200x1000/f0ece4/7E1518.png&text=HUSTERead+Gallery",
+    span: "md:col-span-2 md:row-span-3 sm:col-span-2 sm:row-span-2",
+  },
+  {
+    id: 8,
+    type: "image",
+    title: "人文讲坛",
+    desc: "聆听大师的教诲，开阔视野，提升境界。",
+    url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop",
+    fallbackUrl: "https://dummyimage.com/1200x900/f0ece4/7E1518.png&text=HUSTERead+Gallery",
+    span: "md:col-span-1 md:row-span-2 sm:col-span-1 sm:row-span-2",
+  },
+  {
+    id: 9,
+    type: "image",
+    title: "深夜书房",
+    desc: "一盏孤灯，一卷好书，是深夜里最温暖的慰藉。",
+    url: "https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=1200&auto=format&fit=crop",
+    fallbackUrl: "https://dummyimage.com/1200x900/f0ece4/7E1518.png&text=HUSTERead+Gallery",
+    span: "md:col-span-1 md:row-span-2 sm:col-span-1 sm:row-span-2",
+  },
+  {
+    id: 10,
+    type: "image",
+    title: "书友合影",
+    desc: "因为阅读而相遇，因为志趣而同行。",
+    url: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop",
+    fallbackUrl: "https://dummyimage.com/1200x900/f0ece4/7E1518.png&text=HUSTERead+Gallery",
+    span: "md:col-span-2 md:row-span-2 sm:col-span-2 sm:row-span-2",
+  },
 ];
 
 export default function GalleryPage() {
   return (
-    <div className="max-w-7xl mx-auto py-12 px-4 md:px-8">
-      {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-6 mb-16"
-      >
-        <div className="flex justify-center mb-6">
-          <div className="relative">
-            <div className="absolute -inset-2 bg-primary/10 rounded-full blur-md" />
-            <span className="relative inline-flex p-5 rounded-full bg-card border border-border shadow-sm text-primary">
-              <Camera className="w-8 h-8" strokeWidth={1.5} />
-            </span>
-          </div>
-        </div>
-        <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground">照片墙</h1>
-        <p className="text-lg text-muted-foreground font-serif italic max-w-lg mx-auto">
-          "时间会流逝，但光影被永远定格于纸上。"
-        </p>
-      </motion.div>
-
-      {/* Masonry Layout via CSS Columns */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
-        {photos.map((photo, i) => (
-          <motion.div
-            key={photo.id}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: (i % 4) * 0.1, duration: 0.6, ease: "easeOut" }}
-            className={`relative break-inside-avoid overflow-hidden rounded-sm border-[6px] border-[#FFFDF8] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-transform duration-500 hover:scale-[1.02] group ${photo.height} hover:z-10`}
-          >
-            <div className="h-full w-full flex flex-col relative overflow-hidden">
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                priority={i < 2}
-              />
-              
-              {/* Hover Caption Details */}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 h-1/2">
-                <p className="text-[#F8F5F0] font-serif font-medium tracking-wide drop-shadow-md text-lg pb-3">
-                  『 {photo.caption} 』
-                </p>
-                <div className="w-8 h-[2px] bg-primary/80" />
-              </div>
-            </div>
-            
-            {/* Lightweight grain overlay to keep vintage mood */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.08] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:3px_3px]" />
-            
-            {/* Elegant inner shadow for print feel */}
-            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.15)]" />
-          </motion.div>
-        ))}
-      </div>
+    <div className="min-h-screen bg-background font-serif">
+      <InteractiveBentoGallery
+        mediaItems={mediaItems}
+        title="光影志"
+        description="记录读书会的每一个精彩瞬间，定格那些与书、与友相伴的温暖时光。"
+      />
     </div>
   );
 }
