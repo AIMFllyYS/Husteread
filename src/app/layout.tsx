@@ -45,10 +45,8 @@ export default function RootLayout({
       className={`${notoSerifSC.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="min-h-full flex flex-col font-serif selection:bg-primary selection:text-primary-foreground bg-background text-foreground">
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script dangerouslySetInnerHTML={{ __html: perfScript }} />
         <ThemeProvider>
           {/* 桌面端：顶部导航栏 */}
