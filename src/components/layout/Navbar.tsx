@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Menu } from "lucide-react";
+import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const links = [
   { name: "首页", path: "/" },
@@ -17,20 +18,17 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="blur-heavy sticky top-0 z-50 w-full border-b border-border/40 bg-background/92 supports-[backdrop-filter]:bg-background/88">
+    <header className="blur-heavy sticky top-0 z-50 w-full border-b border-border/40 bg-background/92 supports-[backdrop-filter]:bg-background/88 hidden md:block">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
-        {/* Logo Section */}
         <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
           <span className="font-serif text-2xl font-bold tracking-widest text-primary drop-shadow-sm">
             HUSTERead
           </span>
         </Link>
 
-        {/* Center Links (Desktop) */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="flex items-center gap-8">
           {links.map((link) => {
             const isActive = pathname === link.path || (link.path !== "/" && pathname.startsWith(link.path));
-            
             return (
               <Link
                 key={link.path}
@@ -49,20 +47,15 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Right Section (User Center) */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <ThemeToggle variant="compact" />
           <Link
             href="/profile"
             className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary hover:shadow-sm"
-            aria-label="User Profile"
+            aria-label="个人中心"
           >
             <User className="h-[18px] w-[18px]" strokeWidth={2.5} />
           </Link>
-          
-          {/* Mobile Menu Button */}
-          <button className="md:hidden flex items-center p-2 text-muted-foreground hover:text-primary transition-colors">
-            <Menu className="h-5 w-5" />
-          </button>
         </div>
       </div>
     </header>

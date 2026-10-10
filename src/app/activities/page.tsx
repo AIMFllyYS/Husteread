@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import {
-  CalendarDays, MapPin, Users, ArrowRight, BookOpen, Feather, Music, Star, Sparkles, Clock, CornerDownRight
+  MapPin, Users, BookOpen, Feather, Music, Star, Sparkles, CornerDownRight, CalendarRange
 } from "lucide-react";
+import { ShrinkHero } from "@/components/ui/ShrinkHero";
 
 const EtheralShadow = dynamic(
   () => import("@/components/ui/etheral-shadow").then((m) => m.EtheralShadow),
@@ -77,58 +79,110 @@ const events = [
 ];
 
 // ─────────────────────────────────────────────
+// API integration: try fetching from backend, merge with local data
+// ─────────────────────────────────────────────
+function useActivities() {
+  const [apiEvents, setApiEvents] = useState<typeof events>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchActivities() {
+      try {
+        const res = await fetch("/api/activities?limit=20");
+        if (!res.ok) throw new Error("API error");
+        const json = await res.json();
+        if (!cancelled && json.success && json.data?.items?.length > 0) {
+          const mapped = json.data.items.map((item: Record<string, unknown>, i: number) => ({
+            id: `api-${item.id}`,
+            category: "upcoming",
+            year: new Date(item.start_time as string || item.date as string || Date.now()).getFullYear(),
+            era: (item.status === "COMPLETED" ? "past" : "upcoming") as string,
+            date: new Date(item.start_time as string || item.date as string || Date.now()).toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit" }).replace("/", "."),
+            season: "",
+            title: item.title as string || "活动",
+            emoji: "📖",
+            organizer: "华科读书会",
+            location: (item.location as string) || "待定",
+            mode: "线下",
+            quote: (item.description as string)?.slice(0, 40) || "",
+            description: (item.description as string) || "",
+            activities: [] as string[],
+            icon: BookOpen,
+            color: i % 2 === 0 ? "#9ca3af" : "#a1a1aa",
+          }));
+          setApiEvents(mapped);
+        }
+      } catch {
+        // fallback to local data only
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    fetchActivities();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Merge: local events first, then any API events not already present
+  const allEvents = [...events, ...apiEvents.filter(ae => !events.some(e => e.title === ae.title))];
+  return { events: allEvents, loading };
+}
+
+// ─────────────────────────────────────────────
 // Components
 // ─────────────────────────────────────────────
 
 function HeroSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-
   return (
-    <div ref={ref} className="relative h-[85vh] min-h-[600px] w-full bg-background overflow-hidden flex flex-col justify-end">
-      <div className="blend-heavy absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-multiply dark:mix-blend-screen">
-        <EtheralShadow
-          color="var(--background)"
-          animation={{ scale: 75, speed: 65 }}
-          noise={{ opacity: 0.6, scale: 1.5 }}
-          performanceMode="low"
-        />
-      </div>
-
-      <motion.div 
-        className="relative z-10 w-full px-6 md:px-16 pb-16 md:pb-24 pointer-events-none"
-        style={{ y, opacity }}
-      >
-        <motion.div
-           initial={{ opacity: 0, y: 30 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <p className="font-mono text-muted-foreground text-xs md:text-sm tracking-[0.3em] font-medium mb-6 flex items-center gap-3">
-             <span className="w-8 h-[1px] bg-primary block" /> ARCHIVE & CHRONICLES
-          </p>
-          <h1 className="text-[12vw] leading-[0.85] font-serif font-bold text-foreground tracking-tighter selection:bg-primary selection:text-primary-foreground">
-             LITERARY <br />
-             <span className="text-secondary italic font-light ml-[10vw]">FRAGMENTS.</span>
-          </h1>
-          <div className="mt-12 md:mt-20 flex flex-col md:flex-row gap-8 md:gap-24">
-             <p className="font-mono text-xs md:text-sm text-muted-foreground max-w-sm leading-relaxed border-l border-border pl-4 uppercase tracking-widest">
-               HUSTeread Activity Log.<br />
-               Reflections, gatherings,<br/>
-               and moments in text.
-             </p>
-             <p className="font-serif text-lg md:text-xl text-foreground max-w-md italic leading-relaxed">
-               "每一次聚合，都是思想与文字共振的瞬间。记录那些发生在这个校园里的阅读轨迹。"
-             </p>
+    <ShrinkHero
+      stickyTitle="Literary Fragments · 活动纪实"
+      className="relative h-[85vh] min-h-[600px] w-full bg-background overflow-hidden flex flex-col justify-end"
+    >
+      {({ titleScale, titleOpacity, subOpacity, subY }) => (
+        <>
+          <div className="blend-heavy absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-multiply dark:mix-blend-screen">
+            <EtheralShadow
+              color="var(--background)"
+              animation={{ scale: 75, speed: 65 }}
+              noise={{ opacity: 0.6, scale: 1.5 }}
+              performanceMode="low"
+            />
           </div>
-        </motion.div>
-      </motion.div>
 
-      {/* Extreme gradient bottom fade */}
-      <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
-    </div>
+          <div className="relative z-10 w-full px-6 md:px-16 pb-16 md:pb-24 pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <motion.p style={{ opacity: subOpacity, y: subY }} className="font-mono text-muted-foreground text-xs md:text-sm tracking-[0.3em] font-medium mb-6 flex items-center gap-3">
+                <span className="w-8 h-[1px] bg-primary block" /> ARCHIVE & CHRONICLES
+              </motion.p>
+              <motion.h1
+                style={{ scale: titleScale, opacity: titleOpacity, transformOrigin: "left bottom" }}
+                className="text-[12vw] leading-[0.85] font-serif font-bold text-foreground tracking-tighter selection:bg-primary selection:text-primary-foreground will-change-transform"
+              >
+                LITERARY <br />
+                <span className="text-secondary italic font-light ml-[10vw]">FRAGMENTS.</span>
+              </motion.h1>
+              <motion.div style={{ opacity: subOpacity, y: subY }} className="mt-12 md:mt-20 flex flex-col md:flex-row gap-8 md:gap-24">
+                <p className="font-mono text-xs md:text-sm text-muted-foreground max-w-sm leading-relaxed border-l border-border pl-4 uppercase tracking-widest">
+                  HUSTeread Activity Log.<br />
+                  Reflections, gatherings,<br/>
+                  and moments in text.
+                </p>
+                <p className="font-serif text-lg md:text-xl text-foreground max-w-md italic leading-relaxed">
+                  {'"每一次聚合，都是思想与文字共振的瞬间。记录那些发生在这个校园里的阅读轨迹。"'}
+                </p>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* Extreme gradient bottom fade */}
+          <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
+        </>
+      )}
+    </ShrinkHero>
   );
 }
 
@@ -199,7 +253,7 @@ function ListRow({ event, index }: { event: (typeof events)[0], index: number })
         </h2>
         
         <blockquote className="font-serif italic text-lg text-muted-foreground border-l border-foreground/20 pl-4 mb-6 leading-relaxed max-w-2xl">
-           "{event.quote}"
+           {`"${event.quote}"`}
         </blockquote>
 
         <p className="text-sm text-foreground/70 leading-relaxed max-w-2xl font-sans mb-8">
@@ -243,11 +297,12 @@ function ListRow({ event, index }: { event: (typeof events)[0], index: number })
 // Page
 // ─────────────────────────────────────────────
 export default function ActivitiesPage() {
+  const { events: allEvents } = useActivities();
   const [activeTab, setActiveTab] = useState("all");
 
   const filtered = activeTab === "all"
-    ? events
-    : events.filter((e) => e.category === activeTab);
+    ? allEvents
+    : allEvents.filter((e) => e.category === activeTab);
 
   // Group by year for asymmetric layout
   const byYear = filtered.reduce<Record<number, typeof events>>((acc, ev) => {
@@ -268,15 +323,24 @@ export default function ActivitiesPage() {
       <main className="px-6 md:px-16 pt-24 pb-32">
         {/* Typographic Filter Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-24 border-b border-border/40 pb-8">
-           <h2 className="text-xl font-mono uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-4">
-             <span className="w-2 h-2 rounded-none bg-foreground block"/> CHRONICLES
-           </h2>
-           <div className="flex flex-wrap gap-4 md:gap-8 font-mono text-xs uppercase tracking-widest">
+           <div className="flex items-center gap-6">
+             <h2 className="text-xl font-mono uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-4">
+               <span className="w-2 h-2 rounded-none bg-foreground block"/> CHRONICLES
+             </h2>
+             <Link
+               href="/activities/roadmap"
+               className="inline-flex items-center gap-2 px-4 py-3 min-h-[44px] border border-primary text-primary font-sans text-xs tracking-widest uppercase hover:bg-primary hover:text-primary-foreground transition-colors"
+             >
+               <CalendarRange className="w-3.5 h-3.5" />
+               2026 线路图
+             </Link>
+           </div>
+           <div className="flex flex-wrap gap-2 md:gap-8 font-mono text-xs uppercase tracking-widest">
              {TABS.map(tab => (
                <button 
                  key={tab.id}
                  onClick={() => setActiveTab(tab.id)}
-                 className={`transition-colors duration-300 relative ${activeTab === tab.id ? "text-foreground" : "text-muted-foreground hover:text-foreground/70"}`}
+                 className={`px-3 py-2 min-h-[44px] transition-colors duration-300 relative ${activeTab === tab.id ? "text-foreground" : "text-muted-foreground hover:text-foreground/70"}`}
                >
                  {tab.label}
                  {activeTab === tab.id && (

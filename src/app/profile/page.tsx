@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { BookOpen, Edit3, Calendar, Settings, LogOut, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 // Mock data
 const user = {
@@ -24,13 +23,13 @@ const user = {
 
 export default function ProfilePage() {
   return (
-    <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 md:px-8">
+    <div className="max-w-5xl mx-auto py-8 md:py-12 px-4 sm:px-6 md:px-8">
       {/* Header Section (Library Card Vibe) */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative overflow-hidden rounded-sm border-[1.5px] border-border bg-card p-8 md:p-12 mb-12 shadow-[4px_4px_0_0_var(--color-border)]"
+        className="relative overflow-hidden rounded-sm border-[1.5px] border-border bg-card p-6 md:p-12 mb-8 md:mb-12 shadow-[4px_4px_0_0_var(--color-border)]"
       >
         {/* Subtle decorative stamp/line */}
         <div className="absolute top-0 right-12 w-[1px] h-24 bg-border" />
@@ -51,10 +50,10 @@ export default function ProfilePage() {
             </p>
           </div>
           <div className="shrink-0 flex flex-col gap-3">
-            <button className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium border border-border rounded-full hover:bg-muted/30 transition-colors bg-background">
+            <button className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium border border-border rounded-full hover:bg-muted/30 transition-colors bg-background min-h-[44px]">
               <Settings className="w-4 h-4" /> 账号设定
             </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-destructive border border-transparent hover:bg-destructive/10 rounded-full transition-colors">
+            <button className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-destructive border border-transparent hover:bg-destructive/10 rounded-full transition-colors min-h-[44px]">
               <LogOut className="w-4 h-4" /> 退出登录
             </button>
           </div>
@@ -67,7 +66,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-center mb-3">
                 <stat.icon className="w-5 h-5 text-muted-foreground/60" strokeWidth={1.5} />
               </div>
-              <p className="text-3xl font-serif font-bold text-foreground">{stat.value}</p>
+              <p className="text-2xl md:text-3xl font-serif font-bold text-foreground">{stat.value}</p>
               <p className="text-xs tracking-wider text-muted-foreground">{stat.label}</p>
             </div>
           ))}

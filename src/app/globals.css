@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
   /* 宣纸与水墨 (Ink & Parchment) - 核心色 */
   --background: #F8F5F0;          /* 宣纸白 */
@@ -61,7 +63,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --background: #1A1A1A;
     --foreground: #F0EAD6;
     
@@ -90,6 +92,29 @@
     --input: #3A3A3A;
     --ring: #AA3A3D;
   }
+}
+
+/* 手动选择暗黑模式时强制覆盖 */
+:root[data-theme="dark"] {
+  --background: #1A1A1A;
+  --foreground: #F0EAD6;
+  --card: #222222;
+  --card-foreground: #F0EAD6;
+  --popover: #222222;
+  --popover-foreground: #F0EAD6;
+  --primary: #AA3A3D;
+  --primary-foreground: #FFFFFF;
+  --secondary: #6B7D8B;
+  --secondary-foreground: #FFFFFF;
+  --muted: #333333;
+  --muted-foreground: #A1A1AA;
+  --accent: #333333;
+  --accent-foreground: #F0EAD6;
+  --destructive: #9B2226;
+  --destructive-foreground: #FFFFFF;
+  --border: #3A3A3A;
+  --input: #3A3A3A;
+  --ring: #AA3A3D;
 }
 
 body {
@@ -138,4 +163,10 @@ body {
 /* 代码块使用等宽字体 */
 code, pre, kbd, samp {
   font-family: var(--font-mono), "JetBrains Mono", "Fira Code", monospace;
+}
+
+
+/* 底部安全区域（iPhone 刘海屏） */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }

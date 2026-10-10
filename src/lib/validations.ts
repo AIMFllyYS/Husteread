@@ -81,10 +81,26 @@ export const updateProfileSchema = z.object({
 });
 
 // === Pagination Schema ===
+// `URLSearchParams.get` returns null when omitted; `z.coerce.number()` maps null/""/"   "→0 → fails `.min(1)`.
+// Zod `.default()` only applies to `undefined`, so normalize null/blank strings (after trim) to `undefined`.
+const omitEmptyQueryParam = (v: unknown) => {
+  if (v === null || v === undefined) return undefined;
+  if (typeof v === "string") {
+    const t = v.trim();
+    return t === "" ? undefined : t;
+  }
+  return v;
+};
 
 export const paginationSchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(50).default(20),
+  page: z.preprocess(
+    omitEmptyQueryParam,
+    z.coerce.number().int().min(1).default(1),
+  ),
+  limit: z.preprocess(
+    omitEmptyQueryParam,
+    z.coerce.number().int().min(1).max(50).default(20),
+  ),
 });
 
 // === Report Schema ===
